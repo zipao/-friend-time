@@ -24,12 +24,12 @@ jobs:
           echo "PUB_HOSTED_URL=https://pub.flutter-io.cn" >> $GITHUB_ENV
           echo "FLUTTER_STORAGE_BASE_URL=https://storage.flutter-io.cn" >> $GITHUB_ENV
 
-      - name: 创建 Android 项目脚手架
+      - name: 生成 Android 脚手架（不覆盖现有代码）
         run: |
-          flutter create --project-name time_tracker --org com.timetracker .
-          cd android
-          sed -i 's/ext.kotlin_version = .*/ext.kotlin_version = "1.9.0"/' build.gradle
-        
+          flutter create --project-name time_tracker --org com.timetracker --platforms android _scaffold
+          mv _scaffold/android ./android
+          rm -rf _scaffold
+
       - name: 安装依赖
         run: flutter pub get
 
