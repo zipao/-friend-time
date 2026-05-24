@@ -409,18 +409,17 @@ class _TrendChart extends StatelessWidget {
             topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
           ),
           lineBarsData: lines,
-          lineTouchData: LineTouchData(
-            touchTooltipData: LineTouchTooltipData(
-              tooltipBackgroundColor: AppColors.cardBackground,
-              getTooltipItems: (touchedSpots) => touchedSpots.map((spot) {
-                final cat = selectedCategories[spot.barIndex];
-                return LineTooltipItem(
-                  '${cat.name}: ${TimeUtils.formatDurationCompact((spot.y * 3600).round())}',
-                  TextStyle(color: cat.color, fontSize: 12),
-                );
-              }).toList(),
-            ),
-          ),
+         lineTouchData: LineTouchData(
+  touchTooltipData: LineTouchTooltipData(
+    getTooltipItems: (touchedSpots) => touchedSpots.map((spot) {
+      final cat = selectedCategories[spot.barIndex];
+      return LineTooltipItem(
+        '${cat.name}: ${TimeUtils.formatDurationCompact((spot.y * 3600).round())}',
+        TextStyle(color: cat.color, fontSize: 12),
+      );
+    }).toList(),
+  ),
+),
         ),
       ),
     );
