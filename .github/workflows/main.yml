@@ -30,6 +30,26 @@ jobs:
           mv _scaffold/android ./android
           rm -rf _scaffold
 
+      - name: 修复 Kotlin stdlib 版本冲突
+        run: |
+          python3 - << 'PYEOF'
+          fix = """
+
+          subprojects {
+              configurations.all {
+                  resolutionStrategy.eachDependency { details ->
+                      if (details.requested.group == 'org.jetbrains.kotlin' &&
+                          details.requested.name.startsWith('kotlin-stdlib')) {
+                          details.useVersion '1.8.10'
+                      }
+                  }
+              }
+          }
+          """
+          with open('android/build.gradle', 'a') as f:
+              f.write(fix)
+          PYEOF
+
       - name: 安装依赖
         run: flutter pub get
 
