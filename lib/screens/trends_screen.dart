@@ -411,7 +411,7 @@ class _TrendChart extends StatelessWidget {
           lineBarsData: lines,
           lineTouchData: LineTouchData(
             touchTooltipData: LineTouchTooltipData(
-              tooltipBgColor: AppColors.cardBackground,
+              tooltipBackgroundColor: AppColors.cardBackground,
               getTooltipItems: (touchedSpots) => touchedSpots.map((spot) {
                 final cat = selectedCategories[spot.barIndex];
                 return LineTooltipItem(
