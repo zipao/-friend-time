@@ -31,12 +31,47 @@ class TimeTrackerApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => RecordsProvider()..loadDay(DateTime.now())),
       ],
       child: MaterialApp(
-        title: '时间追踪',
+        title: '朋友时光',
         theme: AppTheme.theme,
         debugShowCheckedModeBanner: false,
-        home: const MainShell(),
+        home: const _AppInit(),
       ),
     );
+  }
+}
+
+/// 启动时恢复记录状态，再进入主界面
+class _AppInit extends StatefulWidget {
+  const _AppInit();
+  @override
+  State<_AppInit> createState() => _AppInitState();
+}
+
+class _AppInitState extends State<_AppInit> {
+  bool _ready = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _init();
+  }
+
+  Future<void> _init() async {
+    await context.read<RecordingProvider>().restoreState();
+    setState(() => _ready = true);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (!_ready) {
+      return const Scaffold(
+        backgroundColor: AppColors.background,
+        body: Center(
+          child: CircularProgressIndicator(color: AppColors.startGreen),
+        ),
+      );
+    }
+    return const MainShell();
   }
 }
 
@@ -91,34 +126,10 @@ class _BottomNav extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _NavItem(
-                icon: Icons.circle_outlined,
-                activeIcon: Icons.circle,
-                label: '记录',
-                isActive: currentIndex == 0,
-                onTap: () => onTap(0),
-              ),
-              _NavItem(
-                icon: Icons.view_timeline_outlined,
-                activeIcon: Icons.view_timeline,
-                label: '时间轴',
-                isActive: currentIndex == 1,
-                onTap: () => onTap(1),
-              ),
-              _NavItem(
-                icon: Icons.show_chart_rounded,
-                activeIcon: Icons.show_chart_rounded,
-                label: '趋势',
-                isActive: currentIndex == 2,
-                onTap: () => onTap(2),
-              ),
-              _NavItem(
-                icon: Icons.settings_outlined,
-                activeIcon: Icons.settings,
-                label: '设置',
-                isActive: currentIndex == 3,
-                onTap: () => onTap(3),
-              ),
+              _NavItem(icon: Icons.circle_outlined, activeIcon: Icons.circle, label: '记录', isActive: currentIndex == 0, onTap: () => onTap(0)),
+              _NavItem(icon: Icons.view_timeline_outlined, activeIcon: Icons.view_timeline, label: '时间轴', isActive: currentIndex == 1, onTap: () => onTap(1)),
+              _NavItem(icon: Icons.show_chart_rounded, activeIcon: Icons.show_chart_rounded, label: '趋势', isActive: currentIndex == 2, onTap: () => onTap(2)),
+              _NavItem(icon: Icons.settings_outlined, activeIcon: Icons.settings, label: '设置', isActive: currentIndex == 3, onTap: () => onTap(3)),
             ],
           ),
         ),
@@ -134,13 +145,7 @@ class _NavItem extends StatelessWidget {
   final bool isActive;
   final VoidCallback onTap;
 
-  const _NavItem({
-    required this.icon,
-    required this.activeIcon,
-    required this.label,
-    required this.isActive,
-    required this.onTap,
-  });
+  const _NavItem({required this.icon, required this.activeIcon, required this.label, required this.isActive, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -154,22 +159,10 @@ class _NavItem extends StatelessWidget {
           children: [
             AnimatedSwitcher(
               duration: const Duration(milliseconds: 200),
-              child: Icon(
-                isActive ? activeIcon : icon,
-                key: ValueKey(isActive),
-                color: isActive ? AppColors.startGreen : AppColors.textHint,
-                size: 22,
-              ),
+              child: Icon(isActive ? activeIcon : icon, key: ValueKey(isActive), color: isActive ? AppColors.startGreen : AppColors.textHint, size: 22),
             ),
             const SizedBox(height: 3),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 11,
-                color: isActive ? AppColors.startGreen : AppColors.textHint,
-                fontWeight: isActive ? FontWeight.w600 : FontWeight.w400,
-              ),
-            ),
+            Text(label, style: TextStyle(fontSize: 11, color: isActive ? AppColors.startGreen : AppColors.textHint, fontWeight: isActive ? FontWeight.w600 : FontWeight.w400)),
           ],
         ),
       ),
