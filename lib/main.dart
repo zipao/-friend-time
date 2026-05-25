@@ -31,7 +31,7 @@ class TimeTrackerApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => RecordsProvider()..loadDay(DateTime.now())),
       ],
       child: MaterialApp(
-        title: '朋友时光',
+        title: 'Time Friend',
         theme: AppTheme.theme,
         debugShowCheckedModeBanner: false,
         home: const _AppInit(),
