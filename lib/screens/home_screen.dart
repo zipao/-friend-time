@@ -79,7 +79,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  void _handleStart() {
+  Future<void> _handleStart() async {
     await context.read<RecordingProvider>().startRecording();
   }
 
@@ -285,8 +285,8 @@ class _StateCard extends StatelessWidget {
 
 class _MainButton extends StatelessWidget {
   final bool isRecording;
-  final VoidCallback onStart;
-  final VoidCallback onStop;
+  final Future<void> Function() onStart;
+  final Future<void> Function() onStop;
 
   const _MainButton({
     required this.isRecording,
