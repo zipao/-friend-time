@@ -86,7 +86,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _handleStop() async {
     final recording = context.read<RecordingProvider>();
     final startTime = recording.startTime!;
-    final endTime = recording.stopRecording(); // 结束，拿到时间戳
+    final endTime = await recording.stopRecording(); // 结束，拿到时间戳
 
     // 弹出分类+备注选择
     final result = await showCategoryNoteSheet(
