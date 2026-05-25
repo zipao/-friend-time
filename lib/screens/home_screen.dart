@@ -85,20 +85,22 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _handleStop() async {
     final recording = context.read<RecordingProvider>();
-    final startTime = recording.startTime!;
-    final endTime = await recording.stopRecording(); // 结束，拿到时间戳
+    final savedStart = recording.startTime!; // 错误4修复：提前保存起始时间
+    final endTime = await recording.stopRecording();
 
-    // 弹出分类+备注选择
+    if (!mounted) return; // 错误3修复：await 后检查页面是否还在
+
     final result = await showCategoryNoteSheet(
       context,
-      startTime: startTime,
+      startTime: savedStart,
       endTime: endTime,
     );
+
+    if (!mounted) return;
+
     if (result == null) {
-      // 用户取消 → 恢复记录状态
-      await context.read<RecordingProvider>().startRecording();
-      // 把 startTime 写回
-      // （简化处理：直接重新开始，复杂实现需保存原始 startTime）
+      // 用户取消 → 用原始 startTime 恢复，不丢计时起点
+      await context.read<RecordingProvider>().restoreRecording(savedStart);
       return;
     }
 
@@ -110,20 +112,23 @@ class _HomeScreenState extends State<HomeScreen> {
     // 二次确认
     final confirmed = await showConfirmSheet(
       context,
-      startTime: startTime,
+      startTime: savedStart,
       endTime: endTime,
       category: category,
       note: note,
     );
+
+    if (!mounted) return;
+
     if (confirmed != true) {
-      // 返回修改 → 恢复记录状态
-      await context.read<RecordingProvider>().startRecording();
+      // 返回修改 → 同样恢复原始起点
+      await context.read<RecordingProvider>().restoreRecording(savedStart);
       return;
     }
 
     // 保存
     await context.read<RecordsProvider>().saveRecord(
-      startTime: startTime,
+      startTime: savedStart,
       endTime: endTime,
       categoryId: categoryId,
       note: note,
@@ -143,6 +148,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _handleManualEntry() async {
     final result = await showManualEntrySheet(context);
+
+    if (!mounted) return; // 错误3修复
+
     if (result == null) return;
 
     final startTime = result['startTime'] as DateTime;
@@ -159,8 +167,11 @@ class _HomeScreenState extends State<HomeScreen> {
       endTime: endTime,
       category: category,
       note: note,
-      allowEndCorrection: false, // 补录不提供修正入口
+      allowEndCorrection: false,
     );
+
+    if (!mounted) return; // 错误3修复
+
     if (confirmed != true) return;
 
     await context.read<RecordsProvider>().saveRecord(
