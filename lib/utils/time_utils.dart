@@ -33,14 +33,12 @@ class TimeUtils {
   }
 
   /// 计时器格式：HH:MM:SS（等宽）
-  static String formatTimer(Duration duration) {
-    final h = duration.inHours.toString().padLeft(2, '0');
-    final m = (duration.inMinutes % 60).toString().padLeft(2, '0');
-    final s = (duration.inSeconds % 60).toString().padLeft(2, '0');
-    if (duration.inHours > 0) {
-      return '$h:$m:$s';
-    }
-    return '$m:$s';
+ static String formatTimer(Duration duration) {
+  final h = duration.inHours.toString().padLeft(2, '0');
+  final m = (duration.inMinutes % 60).toString().padLeft(2, '0');
+  final s = (duration.inSeconds % 60).toString().padLeft(2, '0');
+  return '$h:$m:$s';
+}
   }
 
   /// 格式化时间为 HH:mm
