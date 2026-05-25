@@ -80,7 +80,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _handleStart() {
-    context.read<RecordingProvider>().startRecording();
+    await context.read<RecordingProvider>().startRecording();
   }
 
   Future<void> _handleStop() async {
@@ -96,7 +96,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
     if (result == null) {
       // 用户取消 → 恢复记录状态
-      context.read<RecordingProvider>().startRecording();
+      await context.read<RecordingProvider>().startRecording();
       // 把 startTime 写回
       // （简化处理：直接重新开始，复杂实现需保存原始 startTime）
       return;
@@ -117,7 +117,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
     if (confirmed != true) {
       // 返回修改 → 恢复记录状态
-      context.read<RecordingProvider>().startRecording();
+      await context.read<RecordingProvider>().startRecording();
       return;
     }
 
