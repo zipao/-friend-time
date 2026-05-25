@@ -39,7 +39,7 @@ class TimeUtils {
   final s = (duration.inSeconds % 60).toString().padLeft(2, '0');
   return '$h:$m:$s';
 }
-  }
+  
 
   /// 格式化时间为 HH:mm
   static String formatTime(DateTime dt) {
