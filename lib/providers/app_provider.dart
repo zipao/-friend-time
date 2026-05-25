@@ -1,33 +1,50 @@
 // lib/providers/app_provider.dart
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../models/time_record.dart';
 import '../models/category.dart';
 import '../database/database_helper.dart';
 import '../theme/app_theme.dart';
 
 // ─────────────── RecordingProvider ───────────────
-// 管理当前正在进行的记录状态
+
+const _kStartTimeKey = 'recording_start_time';
 
 class RecordingProvider extends ChangeNotifier {
   DateTime? _startTime;
   bool get isRecording => _startTime != null;
   DateTime? get startTime => _startTime;
 
-  void startRecording() {
+  /// App 启动时调用，恢复上次未结束的记录
+  Future<void> restoreState() async {
+    final prefs = await SharedPreferences.getInstance();
+    final ms = prefs.getInt(_kStartTimeKey);
+    if (ms != null) {
+      _startTime = DateTime.fromMillisecondsSinceEpoch(ms);
+      notifyListeners();
+    }
+  }
+
+  Future<void> startRecording() async {
     _startTime = DateTime.now();
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt(_kStartTimeKey, _startTime!.millisecondsSinceEpoch);
     notifyListeners();
   }
 
-  /// 结束记录，返回结束时间（不保存，由调用方处理）
-  DateTime stopRecording() {
+  Future<DateTime> stopRecording() async {
     final endTime = DateTime.now();
     _startTime = null;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_kStartTimeKey);
     notifyListeners();
     return endTime;
   }
 
-  void cancelRecording() {
+  Future<void> cancelRecording() async {
     _startTime = null;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_kStartTimeKey);
     notifyListeners();
   }
 
@@ -54,7 +71,6 @@ class CategoryProvider extends ChangeNotifier {
     required String name,
     required String icon,
   }) async {
-    // 自动取色
     final colorIndex = _categories.length % AppColors.categoryPalette.length;
     final color = AppColors.categoryPalette[colorIndex];
 
@@ -127,7 +143,6 @@ class RecordsProvider extends ChangeNotifier {
     await refresh();
   }
 
-  /// 获取某天总时长（秒）
   int getTotalSecondsForDay(DateTime day) {
     return _dayRecords
         .where((r) {
