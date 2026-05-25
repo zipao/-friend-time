@@ -13,16 +13,16 @@ jobs:
       - name: 拉取代码
         uses: actions/checkout@v4
 
+      - name: 设置国内镜像
+        run: |
+          echo "PUB_HOSTED_URL=https://pub.flutter-io.cn" >> $GITHUB_ENV
+          echo "FLUTTER_STORAGE_BASE_URL=https://storage.flutter-io.cn" >> $GITHUB_ENV
+
       - name: 安装 Flutter
         uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.22.0'
           channel: 'stable'
-
-      - name: 设置国内镜像
-        run: |
-          echo "PUB_HOSTED_URL=https://pub.flutter-io.cn" >> $GITHUB_ENV
-          echo "FLUTTER_STORAGE_BASE_URL=https://storage.flutter-io.cn" >> $GITHUB_ENV
 
       - name: 创建 Android 项目脚手架
         run: |
@@ -34,12 +34,12 @@ jobs:
         run: |
           sed -i 's/android:label="[^"]*"/android:label="Time Friend"/' android/app/src/main/AndroidManifest.xml
 
-     - name: 安装依赖
-       run: |
-         for i in 1 2 3; do
-           flutter pub get && break || echo "第 $i 次失败，重试..."
-           sleep 5
-        done
+      - name: 安装依赖
+        run: |
+          for i in 1 2 3; do
+            flutter pub get && break || echo "第 $i 次失败，重试..."
+            sleep 5
+          done
 
       - name: 生成应用图标
         run: flutter pub run flutter_launcher_icons
