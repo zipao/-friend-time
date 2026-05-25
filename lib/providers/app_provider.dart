@@ -48,6 +48,14 @@ class RecordingProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// 用户取消保存时，将原始开始时间写回，恢复记录中状态
+  Future<void> restoreRecording(DateTime originalStart) async {
+    _startTime = originalStart;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt(_kStartTimeKey, _startTime!.millisecondsSinceEpoch);
+    notifyListeners();
+  }
+
   Duration get elapsed {
     if (_startTime == null) return Duration.zero;
     return DateTime.now().difference(_startTime!);
