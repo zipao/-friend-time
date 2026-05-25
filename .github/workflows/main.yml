@@ -24,34 +24,21 @@ jobs:
           echo "PUB_HOSTED_URL=https://pub.flutter-io.cn" >> $GITHUB_ENV
           echo "FLUTTER_STORAGE_BASE_URL=https://storage.flutter-io.cn" >> $GITHUB_ENV
 
-      - name: 生成 Android 脚手架（不覆盖现有代码）
+      - name: 创建 Android 项目脚手架
         run: |
-          flutter create --project-name time_tracker --org com.timetracker --platforms android _scaffold
-          mv _scaffold/android ./android
-          rm -rf _scaffold
+          flutter create --project-name time_tracker --org com.timetracker .
+          cd android
+          sed -i 's/ext.kotlin_version = .*/ext.kotlin_version = "1.9.0"/' build.gradle
 
-      - name: 修复 Kotlin stdlib 版本冲突
+      - name: 修改应用名称
         run: |
-          python3 - << 'PYEOF'
-          fix = """
-
-          subprojects {
-              configurations.all {
-                  resolutionStrategy.eachDependency { details ->
-                      if (details.requested.group == 'org.jetbrains.kotlin' &&
-                          details.requested.name.startsWith('kotlin-stdlib')) {
-                          details.useVersion '1.8.10'
-                      }
-                  }
-              }
-          }
-          """
-          with open('android/build.gradle', 'a') as f:
-              f.write(fix)
-          PYEOF
+          sed -i 's/android:label="[^"]*"/android:label="Time Friend"/' android/app/src/main/AndroidManifest.xml
 
       - name: 安装依赖
         run: flutter pub get
+
+      - name: 生成应用图标
+        run: flutter pub run flutter_launcher_icons
 
       - name: 编译 APK
         run: flutter build apk --release
