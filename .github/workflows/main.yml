@@ -34,8 +34,12 @@ jobs:
         run: |
           sed -i 's/android:label="[^"]*"/android:label="Time Friend"/' android/app/src/main/AndroidManifest.xml
 
-      - name: 安装依赖
-        run: flutter pub get
+     - name: 安装依赖
+       run: |
+         for i in 1 2 3; do
+           flutter pub get && break || echo "第 $i 次失败，重试..."
+           sleep 5
+        done
 
       - name: 生成应用图标
         run: flutter pub run flutter_launcher_icons
